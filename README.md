@@ -25,3 +25,5 @@ Currently, the project uses an in-memory mock vector search implementation for l
 
 ```bash
 python -m uvicorn app.main:app --reload
+Forked Endee repository:
+https://github.com/kavina69/endee
