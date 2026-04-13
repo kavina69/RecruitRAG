@@ -1,36 +1,20 @@
-import os
-from openai import OpenAI
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-
 def generate_match_explanation(query: str, retrieved_chunks: list):
-    context = "\n\n".join(
-        [f"Candidate chunk {i + 1}:\n{chunk}" for i, chunk in enumerate(retrieved_chunks)]
+    if not retrieved_chunks:
+        return "No matching candidates were found for the given query."
+
+    explanation = []
+    explanation.append(f"Search Query: {query}")
+    explanation.append("")
+    explanation.append("Top Matching Resume Chunks:")
+    explanation.append("")
+
+    for i, chunk in enumerate(retrieved_chunks[:5], start=1):
+        short_chunk = chunk[:300].replace("\n", " ")
+        explanation.append(f"{i}. {short_chunk}...")
+
+    explanation.append("")
+    explanation.append(
+        "These candidates were matched based on semantic similarity between the recruiter query and the resume content."
     )
 
-    prompt = f"""
-You are a recruiter assistant.
-
-Job Query:
-{query}
-
-Retrieved Resume Chunks:
-{context}
-
-Task:
-1. Identify the top matching candidates
-2. Explain why they match
-3. Mention relevant skills, experience, and possible missing skills
-4. Keep the answer concise and grounded only in the provided resume chunks
-"""
-
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful recruiter assistant."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-
-    return response.choices[0].message.content
+    return "\n".join(explanation)

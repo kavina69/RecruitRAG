@@ -1,15 +1,18 @@
-import os
-from openai import OpenAI
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-EMBED_MODEL = "text-embedding-3-small"
+import math
+from collections import Counter
 
 
 def get_embedding(text: str):
-    text = text.replace("\n", " ")
-    response = client.embeddings.create(
-        model=EMBED_MODEL,
-        input=text
-    )
-    return response.data[0].embedding
+    text = text.lower().strip()
+
+    if not text:
+        return [0.0] * 26
+
+    counts = Counter(c for c in text if c.isalpha())
+    vector = [float(counts.get(chr(ord('a') + i), 0)) for i in range(26)]
+
+    norm = math.sqrt(sum(x * x for x in vector))
+    if norm == 0:
+        return vector
+
+    return [x / norm for x in vector]

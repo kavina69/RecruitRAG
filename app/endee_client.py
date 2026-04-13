@@ -1,3 +1,4 @@
+# This file simulates Endee vector database operations for resume retrieval
 from typing import List, Dict, Any
 
 DB = []
